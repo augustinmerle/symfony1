@@ -8,9 +8,9 @@
  * file that was distributed with this source code.
  */
 
-require_once(dirname(__FILE__).'/../../bootstrap/unit.php');
+require_once(__DIR__.'/../../bootstrap/unit.php');
 
-$t = new lime_test(153);
+$t = new lime_test(157);
 
 class FormTest extends sfForm
 {
@@ -652,6 +652,18 @@ $t->ok(!isset($f['author'][sfForm::getCSRFFieldName()]), '->embedForm() removes 
 $t->is($w['author']->generateName('first_name'), 'article[author][first_name]', '->embedForm() changes the name format to reflect the embedding');
 $t->is($w['author']['company']->generateName('name'), 'article[author][company][name]', '->embedForm() changes the name format to reflect the embedding');
 
+// tests for ticket #56
+$t->ok($author->getValidator('company') == $company_validator_schema, '->getValidator() gets a validator schema for an embedded form');
+try
+{
+  $author->setValidator('company', new sfValidatorPass());
+  $t->fail('"sfForm" Trying to set a validator for an embedded form field throws a LogicException');
+}
+catch (LogicException $e)
+{
+  $t->pass('"sfForm" Trying to set a validator for an embedded form field throws a LogicException');
+}
+
 // tests for ticket #4754
 $f1 = new TestForm1();
 $f2 = new TestForm2();
@@ -993,3 +1005,46 @@ $expected = array (
 );
 
 $t->is($f1->getErrors(), $expected, '->getErrors() return array of errors');
+
+// bind with a simulated file upload in the POST array
+$f = new FormTest();
+try
+{
+  $f->bind(array(
+    'file' => array(
+      'name' => 'foo.txt',
+      'type' => 'text/plain',
+      'tmp_name' => 'somefile',
+      'error' => 0,
+      'size' => 10,
+     ),
+  ));
+  $t->fail('Cannot fake a file upload with a POST');
+}
+catch (InvalidArgumentException $e)
+{
+  $t->pass('Cannot fake a file upload with a POST');
+}
+
+$f = new FormTest();
+try
+{
+  $f->bind(array(
+      'foo' => array(
+        'bar' => array(
+          'file' => array(
+            'name' => 'foo.txt',
+            'type' => 'text/plain',
+            'tmp_name' => 'somefile',
+            'error' => 0,
+            'size' => 10,
+          ),
+        ),
+      ),
+  ));
+  $t->fail('Cannot fake a file upload with a POST');
+}
+catch (InvalidArgumentException $e)
+{
+  $t->pass('Cannot fake a file upload with a POST');
+}

@@ -74,7 +74,7 @@ class sfRoutingConfigHandler extends sfYamlConfigHandler
   protected function parse($configFiles)
   {
     // parse the yaml
-    $config = self::getConfiguration($configFiles);
+    $config = static::getConfiguration($configFiles);
 
     // collect routes
     $routes = array();
@@ -95,7 +95,7 @@ class sfRoutingConfigHandler extends sfYamlConfigHandler
       else
       {
         $routes[$name] = array(isset($params['class']) ? $params['class'] : 'sfRoute', array(
-          $params['url'] ? $params['url'] : '/',
+          $params['url'] ?: '/',
           isset($params['params']) ? $params['params'] : (isset($params['param']) ? $params['param'] : array()),
           isset($params['requirements']) ? $params['requirements'] : array(),
           isset($params['options']) ? $params['options'] : array(),
@@ -111,6 +111,6 @@ class sfRoutingConfigHandler extends sfYamlConfigHandler
    */
   static public function getConfiguration(array $configFiles)
   {
-    return self::parseYamls($configFiles);
+    return static::parseYamls($configFiles);
   }
 }

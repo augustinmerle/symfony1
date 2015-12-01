@@ -1,14 +1,56 @@
 CHANGELOG
 =========
 
+22/07/2015: Version 1.5.6
+-------------------------
+
+* Reverts #94. APCu 4.0.7+ is required for PHP 5.5+ #99
+
+18/07/2015: Version 1.5.5
+-------------------------
+
+* Static Code Analysis with Php Inspections #97
+* Change log level of sfException to CRITICAL #96
+
+15/06/2015: Version 1.5.4
+-------------------------
+
+* Add blob support to yaml files #38
+* Ability to integrate a psr compliant log #71
+* Add OPTIONS method in sfRequest #75
+* Add multiple file input #86
+* Allows newer versions of Swiftmailer #90
+* Allow to specify environment in sfI18nExtractTask #92
+
+17/09/2014: Version 1.5.3
+-------------------------
+
+* Use late static binding for config classes #25
+* Remove Doctrine from dependencies (add Doctrine and Propel as suggestions) #35
+* Add relative option for PublishAssetsTask #43
+* Add an option to test:all task to show full output #55
+* Improve PHP built-in webserver compatibility #58
+* Update Swiftmailer to ~5.2.1 #59
+* Re-add Propel in sfDatabaseSessionStorage #66
+
+10/30/2013: Version 1.5.2
+-------------------------
+
+ * Drop support for PHP 5.2
+ * Add support for PHP 5.5
+
+10/04/13: Version 1.5.0
+-----------------------
+
+ * inject the routing into the service container
  * decoupled routing cache key generation to make it customizable
  * optimized sfCompileConfigHandler and added unit tests
  * added possibility to use sfAPCCache without APC (same as sfNoCache)
  * added logger into service container for command
- * optimized sfPatternRouting cache with unserialise sfRoute objects on demand, huge gain with lookup_cache_dedicated_keys
+ * optimized sfPatternRouting cache with unserialise sfRoute objects on demand, huge gain with `lookup_cache_dedicated_keys`
  * added sf_cli core configuration
  * added default option --no-debug for tasks (usefull for project:optimize task)
- * used is_file instead of file_exists in sfFileCache, sfAutoload, sfApplicationConfiguration, sfProjectConfiguration and sfSessionTestStorage classes
+ * used `is_file` instead of `file_exists` in sfFileCache, sfAutoload, sfApplicationConfiguration, sfProjectConfiguration and sfSessionTestStorage classes
  * added sfBaseTask::isVerbose() method
  * fixed "plugin:publish-assets" task generate absolute symlinks
  * fixed "project:optimize" task: file permissions, configurable environment and module generation
@@ -33,7 +75,7 @@ CHANGELOG
  * better code coverage for sfWebRequest class unit tests
  * added parameters proxy to sfWebRequest::getClientIp() method (default true)
  * introduced trust_proxy option on sfWebRequest (default true)
- * added call to fastcgi_finish_request() function if available on sfWebResponse::run() method
+ * added call to `fastcgi_finish_request()` function if available on sfWebResponse::run() method
  * added possibility to launch bin/coverage task for only one class
  * added sfRequest::getOption() method
  * used SQLite 3 for php 5.3 or later, as it's required for php 5.4
@@ -73,15 +115,18 @@ CHANGELOG
  * imported sfServiceContainer component
  * replaced embedded swiftmailer by upstream submodule of swiftmailer 4.1
  * removed sfPropelPlugin
+ * add `sfNoMailer` class for application without mail
+ * do no remove .* files when clearing the cache
+ * Add helper __() to sfComponent to translate messages
 
-05/30/12: Versions 1.4.18 
-------------------------- 
+05/30/12: Version 1.4.18
+------------------------
 
- * [33466] fixed a possible DB session fixation attack (patch from Dmitri Groutso) 
- * [33373] fixed test browser click function does not handle css selector without [ or ] (closes #9982, patch from mouette) 
+ * [33466] fixed a possible DB session fixation attack (patch from Dmitri Groutso)
+ * [33373] fixed test browser click function does not handle css selector without [ or ] (closes #9982, patch from mouette)
 
-08/03/12: Versions 1.4.17
--------------------------
+08/03/12: Version 1.4.17
+------------------------
 
  * [33363] added some tests (closes #3237, patch from Stephen.Ostrow)
  * [33362] fixed a notice on PHP 5.4 (closes #9985, patch from bshaffer)

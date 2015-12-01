@@ -101,7 +101,11 @@ abstract class sfDatabaseSessionStorage extends sfSessionStorage
 
     // get the database and connection
     $databaseClass = get_class($database);
-    if ($databaseClass == 'sfDoctrineDatabase')
+    if ($databaseClass == 'sfPropelDatabase')
+    {
+      $this->db = Propel::getConnection($database->getParameter('name'));
+    }
+    elseif($databaseClass == 'sfDoctrineDatabase')
     {
       $this->db = $database->getConnection();
     }
@@ -188,14 +192,5 @@ abstract class sfDatabaseSessionStorage extends sfSessionStorage
     $this->sessionRead($newId);
 
     return $this->sessionWrite($newId, $this->sessionRead($currentId));
-  }
-
-  /**
-   * Executes the shutdown procedure.
-   *
-   */
-  public function shutdown()
-  {
-    parent::shutdown();
   }
 }

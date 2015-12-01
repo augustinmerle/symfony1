@@ -222,6 +222,8 @@ class sfForm implements ArrayAccess, Iterator, Countable
       $this->taintedFiles = array();
     }
 
+    $this->checkTaintedValues($this->taintedValues);
+
     try
     {
       $this->doBind(self::deepArrayUnion($this->taintedValues, self::convertFileInformation($this->taintedFiles)));
@@ -608,6 +610,10 @@ class sfForm implements ArrayAccess, Iterator, Countable
    */
   public function setValidator($name, sfValidatorBase $validator)
   {
+    if (isset($this->embeddedForms[$name])) {
+      throw new LogicException('You cannot set a validator for an embedded form.');
+    }
+
     $this->validatorSchema[$name] = $validator;
 
     $this->resetFormFields();
@@ -627,6 +633,10 @@ class sfForm implements ArrayAccess, Iterator, Countable
     if (!isset($this->validatorSchema[$name]))
     {
       throw new InvalidArgumentException(sprintf('The validator "%s" does not exist.', $name));
+    }
+
+    if (isset($this->embeddedForms[$name])) {
+      return $this->embeddedForms[$name]->getValidatorSchema();
     }
 
     return $this->validatorSchema[$name];
@@ -846,7 +856,7 @@ class sfForm implements ArrayAccess, Iterator, Countable
 
     if ($this->isCSRFProtected())
     {
-      $this->setDefault(self::$CSRFFieldName, $this->getCSRFToken($this->localCSRFSecret ? $this->localCSRFSecret : self::$CSRFSecret));
+      $this->setDefault(self::$CSRFFieldName, $this->getCSRFToken($this->localCSRFSecret ?: self::$CSRFSecret));
     }
 
     $this->resetFormFields();
@@ -916,7 +926,7 @@ class sfForm implements ArrayAccess, Iterator, Countable
   {
     if (null === $secret)
     {
-      $secret = $this->localCSRFSecret ? $this->localCSRFSecret : self::$CSRFSecret;
+      $secret = $this->localCSRFSecret ?: self::$CSRFSecret;
     }
 
     return md5($secret.session_id().get_class($this));
@@ -1391,5 +1401,25 @@ class sfForm implements ArrayAccess, Iterator, Countable
     }
 
     return $array1;
+  }
+
+  /**
+   * Checks that the $_POST values do not contain something that
+   * looks like a file upload (coming from $_FILE).
+   */
+  protected function checkTaintedValues($values)
+  {
+    foreach ($values as $name => $value)
+    {
+      if (!is_array($value)) {
+        continue;
+      }
+
+      if (isset($value['tmp_name'])) {
+        throw new InvalidArgumentException('Do not try to fake a file upload.');
+      }
+
+      $this->checkTaintedValues($value);
+    }
   }
 }

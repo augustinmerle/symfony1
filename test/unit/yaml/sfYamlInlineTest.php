@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-require_once(dirname(__FILE__).'/../../bootstrap/unit.php');
+require_once(__DIR__.'/../../bootstrap/unit.php');
 
 sfYaml::setSpecVersion('1.1');
 
@@ -30,7 +30,7 @@ $testsForLoad = array(
   '02333' => 02333,
   '.Inf' => -log(0),
   '-.Inf' => log(0),
-  '123456789123456789' => '123456789123456789',
+  '123456789123456789000' => '123456789123456789000',
   '"foo\r\nbar"' => "foo\r\nbar",
   "'foo#bar'" => 'foo#bar',
   "'foo # bar'" => 'foo # bar',

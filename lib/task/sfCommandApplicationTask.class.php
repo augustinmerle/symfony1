@@ -128,9 +128,11 @@ abstract class sfCommandApplicationTask extends sfTask
    */
   protected function initializeMailer()
   {
-    $swift_dir = sfConfig::get('sf_symfony_lib_dir').'/vendor/swiftmailer/lib';
-    require_once $swift_dir.'/classes/Swift.php';
-    Swift::registerAutoload($swift_dir.'/swift_init.php');
+    if (!class_exists('Swift'))
+    {
+      $swift_dir = sfConfig::get('sf_symfony_lib_dir').'/vendor/swiftmailer/lib';
+      require_once $swift_dir.'/swift_required.php';
+    }
 
     $config = $this->getFactoryConfiguration();
 
@@ -197,6 +199,7 @@ abstract class sfCommandApplicationTask extends sfTask
       $this->serviceContainer = new $class();
       $this->serviceContainer->setService('sf_event_dispatcher', $this->dispatcher);
       $this->serviceContainer->setService('sf_formatter', $this->formatter);
+      $this->serviceContainer->setService('sf_routing', $this->getRouting());
     }
 
     return $this->serviceContainer;

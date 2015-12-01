@@ -126,6 +126,10 @@ class sfWebRequest extends sfRequest
           $this->setMethod(self::HEAD);
           break;
 
+        case 'OPTIONS':
+          $this->setMethod(self::OPTIONS);
+          break;
+
         default:
           $this->setMethod(self::GET);
       }
@@ -204,7 +208,7 @@ class sfWebRequest extends sfRequest
   {
     $pathArray = $this->getPathInfoArray();
 
-    return isset($pathArray['REQUEST_URI']) ? preg_match('/^http/', $pathArray['REQUEST_URI']) : false;
+    return isset($pathArray['REQUEST_URI']) ? 0 === strpos($pathArray['REQUEST_URI'], 'http') : false;
   }
 
   /**
@@ -461,7 +465,7 @@ class sfWebRequest extends sfRequest
     $languages = $this->splitHttpAcceptHeader($_SERVER['HTTP_ACCEPT_LANGUAGE']);
     foreach ($languages as $lang)
     {
-      if (strstr($lang, '-'))
+      if (false !== strpos($lang, '-'))
       {
         $codes = explode('-', $lang);
         if ($codes[0] == 'i')
@@ -660,12 +664,13 @@ class sfWebRequest extends sfRequest
   public function splitHttpAcceptHeader($header)
   {
     $values = array();
+    $groups = array();
     foreach (array_filter(explode(',', $header)) as $value)
     {
       // Cut off any q-value that might come after a semi-colon
       if ($pos = strpos($value, ';'))
       {
-        $q     = (float) trim(substr($value, strpos($value, '=') + 1));
+        $q     = trim(substr($value, strpos($value, '=') + 1));
         $value = substr($value, 0, $pos);
       }
       else
@@ -673,15 +678,20 @@ class sfWebRequest extends sfRequest
         $q = 1;
       }
 
-      if (0 < $q)
-      {
-        $values[trim($value)] = $q;
+      $groups[$q][] = $value;
+    }
+
+    krsort($groups);
+
+    foreach ($groups as $q => $items) {
+      if (0 < $q) {
+        foreach ($items as $value) {
+          $values[] = trim($value);
+        }
       }
     }
 
-    arsort($values);
-
-    return array_keys($values);
+    return $values;
   }
 
   /**

@@ -487,7 +487,25 @@ abstract class sfBaseTask extends sfCommandApplicationTask
     $eta = $this->convertTime($eta);
     $elapsed = $this->convertTime($elapsed);
 
-    $statusBar .= ' [ remaining: '.$eta.' | elapsed: '.$elapsed.' ]     ';
+    $memory = memory_get_usage(true);
+    if ($memory>1024*1024*1024*10)
+    {
+      $memory = sprintf('%.2fGB', $memory/1024/1024/1024);
+    }
+    elseif ($memory>1024*1024*10)
+    {
+      $memory = sprintf('%.2fMB', $memory/1024/1024);
+    }
+    elseif ($memory>1024*10)
+    {
+      $memory = sprintf('%.2fkB', $memory/1024);
+    }
+    else
+    {
+      $memory = sprintf('%.2fB', $memory);
+    }
+
+    $statusBar .= ' [ remaining: '.$eta.' | elapsed: '.$elapsed.' ] (memory: '.$memory.')     ';
 
     echo $statusBar;
 
@@ -511,19 +529,19 @@ abstract class sfBaseTask extends sfCommandApplicationTask
 
     if ($time > 3600)
     {
-      $h = intval(abs($time / 3600));
+      $h = (int) abs($time / 3600);
       $time -= ($h * 3600);
       $string .= $h. ' h ';
     }
 
     if ($time > 60)
     {
-      $m = intval(abs($time / 60));
+      $m = (int) abs($time / 60);
       $time -= ($m * 60);
       $string .= $m. ' min ';
     }
 
-    $string .= intval($time).' sec';
+    $string .= (int) $time.' sec';
 
     return $string;
   }
